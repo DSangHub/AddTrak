@@ -1,2 +1,2 @@
 import { SignIn } from "@clerk/nextjs";
-export default function SignInPage(){return <main className="authShell"><SignIn /></main>}
+export default function SignInPage(){return <main className="authShell"><SignIn forceRedirectUrl="/business/dashboard" signUpUrl="/sign-up" /></main>}
