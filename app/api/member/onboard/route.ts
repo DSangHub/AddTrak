@@ -12,10 +12,13 @@ export async function POST(request: Request) {
   const phone = String(form.get("phone") || "").trim();
   const zip = String(form.get("zip") || "").trim();
   const preferredLanguage = String(form.get("preferredLanguage") || "en") === "es" ? "es" : "en";
-  if (!firstName || !lastName || !/^\S+@\S+\.\S+$/.test(email) || !/^\d{5}$/.test(zip)) {
+  const publicNameConsent = form.get("publicNameConsent") === "on";
+  if (!firstName || !lastName || !/^\S+@\S+\.\S+$/.test(email) || !/^\d{5}$/.test(zip) || !publicNameConsent) {
     return Response.json({ error: "Required member information is incomplete" }, { status: 400 });
   }
   const sql = database();
-  await sql`INSERT INTO member_profiles (clerk_user_id,first_name,last_name,email,phone,zip,preferred_language) VALUES (${userId},${firstName},${lastName},${email},${phone},${zip},${preferredLanguage}) ON CONFLICT (clerk_user_id) DO UPDATE SET first_name=EXCLUDED.first_name,last_name=EXCLUDED.last_name,email=EXCLUDED.email,phone=EXCLUDED.phone,zip=EXCLUDED.zip,preferred_language=EXCLUDED.preferred_language,updated_at=NOW()`;
+  const base = `${firstName}-${lastName}`.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40) || "profile";
+  const publicSlug = `${base}-${crypto.randomUUID().replace(/-/g,"").slice(0,8)}`;
+  await sql`INSERT INTO bankknit.member_profiles (clerk_user_id,first_name,last_name,email,phone,zip,preferred_language,public_slug,public_name_consent_at) VALUES (${userId},${firstName},${lastName},${email},${phone},${zip},${preferredLanguage},${publicSlug},NOW()) ON CONFLICT (clerk_user_id) DO UPDATE SET first_name=EXCLUDED.first_name,last_name=EXCLUDED.last_name,email=EXCLUDED.email,phone=EXCLUDED.phone,zip=EXCLUDED.zip,preferred_language=EXCLUDED.preferred_language,public_slug=COALESCE(member_profiles.public_slug,EXCLUDED.public_slug),public_name_consent_at=NOW(),updated_at=NOW()`;
   redirect("/member/dashboard");
 }

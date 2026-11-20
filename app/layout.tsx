@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AddTrak | Move inventory. Build loyalty.",
-  description: "AddTrak helps businesses promote slow-moving inventory and build membership programs customers can earn back through qualifying purchases.",
+  title: "BankKnit | Bank-Issued Verified Name Profiles",
+  description: "Create a shareable Verified Name Profile issued by a participating bank or credit union. Banks receive consented local leads and can issue active, expiring badges.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
